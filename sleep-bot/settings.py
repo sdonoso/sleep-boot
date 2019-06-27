@@ -51,7 +51,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'Django_sleepBot.urls'
+ROOT_URLCONF = 'sleep-bot.urls'
 
 TEMPLATES = [
     {
