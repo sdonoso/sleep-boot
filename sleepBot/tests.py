@@ -15,7 +15,7 @@ class SleepModelTest(TestCase):
     def test_get_person(self):
         person = Person.objects.get(id_telegram="juanito")
         self.assertEquals(person.name, "juan")
-        self.assertEquals(person.creation_date.day, 27)
+        self.assertEquals(person.creation_date.day, timezone.now().day) # Antes decia 27
 
     def test_data(self):
         person = Person.objects.get(id_telegram="juanito")
