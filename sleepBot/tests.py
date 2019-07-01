@@ -36,3 +36,17 @@ class CreatePersonTest(TestCase):
         person = Person.objects.get(id_telegram="101")
         self.assertEquals(person.name, "Jorge")
 
+
+class CreateDataTest(TestCase):
+
+    def setUp(self):
+        self.person = Person.objects.create(id_telegram="100", name="juan")
+        self.client = Client()
+
+    def test_create_data(self):
+        id_person = self.person.pk
+        response = self.client.post("/datas/", {"person":"/persons/"+str(id_person)+"/", "sleep_hours":8, "mood":4})
+        self.assertEquals(response.status_code, 201)
+
+        data = Data.objects.get(person=self.person)
+        self.assertEquals(data.sleep_hours, 8)

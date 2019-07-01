@@ -21,6 +21,7 @@ from sleepBot import views
 
 router = routers.DefaultRouter()
 router.register(r'persons', views.PersonViewSet)
+router.register(r'datas', views.DataViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
