@@ -26,5 +26,6 @@ router.register(r'datas', views.DataViewSet)
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include(router.urls)),
-    path('api-auth/', include('rest_framework.urls', namespace='rest_framework'))
+    path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+    path('graph/person/<str:id_person>', views.InfoDataPerson.as_view(), name = 'graph-person'),
 ]

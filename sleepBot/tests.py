@@ -1,5 +1,5 @@
 from django.test import TestCase, Client
-from datetime import datetime
+import datetime
 from .models import Person, Data
 from django.utils import timezone
 
@@ -50,3 +50,21 @@ class CreateDataTest(TestCase):
 
         data = Data.objects.get(person=self.person)
         self.assertEquals(data.sleep_hours, 8)
+
+class InfoDataWeek(TestCase):
+
+    def setUp(self):
+        self.client = Client()
+        self.person = Person.objects.create(id_telegram="1", name="Jorge")
+        today = timezone.now()
+        for i in range (7):
+            Data.objects.create(person=self.person, sleep_hours=8, mood=7, time_stamp=today - datetime.timedelta(days = i))
+
+    def test_data_created(self):
+        person = Person.objects.get(id_telegram="1")
+        data = Data.objects.filter(person=person)
+        self.assertEquals(len(data),7)
+
+    def test_info_data(self):
+        response = self.client.get("/graph/person/"+str(self.person.pk))
+        self.assertEquals(response.status_code, 200)
