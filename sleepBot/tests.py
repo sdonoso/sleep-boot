@@ -1,4 +1,4 @@
-from django.test import TestCase
+from django.test import TestCase, Client
 from datetime import datetime
 from .models import Person, Data
 from django.utils import timezone
@@ -23,3 +23,16 @@ class SleepModelTest(TestCase):
         self.assertEquals(len(data),2)
         self.assertEquals(data[0].mood,4)
         self.assertEquals(data[1].mood,11)
+
+class CreatePersonTest(TestCase):
+
+    def setUp(self):
+        self.client = Client()
+
+    def test_create_person(self):
+        response = self.client.post("/persons/", {"name":"Jorge", "id_telegram":"101"})
+        self.assertEquals(response.status_code, 201)
+
+        person = Person.objects.get(id_telegram="101")
+        self.assertEquals(person.name, "Jorge")
+
