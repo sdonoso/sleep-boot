@@ -9,6 +9,7 @@ from .models import Person, Data
 
 import plotly.plotly as py
 import plotly.graph_objs as go
+from plotly.offline import plot
 import plotly as plotly_
 plotly_.tools.set_credentials_file(username='jpintoriv', api_key='FEkr4GXDbnI1hhTmRDxg')
 
@@ -67,7 +68,7 @@ class InfoDataPerson(View):
         )
         data_graph = [mood_graph, sleep_hours_graph]
 
-        graph = py.plot(data_graph, auto_open=False, output_type='div')
+        graph = plot(data_graph, auto_open=False, output_type='div')
         self.context['graph'] = graph
 
         if(len(data)):
