@@ -5,6 +5,7 @@ from telegram.ext import CallbackContext, Updater
 from telegram.ext import CommandHandler, Filters, MessageHandler
 
 from scriptBot.messages import REGISTRATION_TEXT, START_TEXT
+from scriptBot.botSettings import KEY
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.INFO)
@@ -37,7 +38,7 @@ def main():
     # Create the Updater and pass it your bot's token.
     # Make sure to set use_context=True to use the new context based callbacks
     # Post version 12 this will no longer be necessary
-    updater = Updater("KEY", use_context=True)
+    updater = Updater(KEY, use_context=True)
     # Get the dispatcher to register handlers
     flag = 0
     dp = updater.dispatcher
