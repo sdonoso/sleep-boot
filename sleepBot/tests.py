@@ -57,14 +57,21 @@ class InfoDataWeek(TestCase):
         self.client = Client()
         self.person = Person.objects.create(id_telegram="1", name="Jorge")
         today = timezone.now()
+        data = [{"sleep_hours":5,"mood":6}, {"sleep_hours":8,"mood":10},{"sleep_hours":7,"mood":9},
+            {"sleep_hours":3,"mood":2},{"sleep_hours":7,"mood":6}, {"sleep_hours":10,"mood":9}, {"sleep_hours":8,"mood":10},]
         for i in range (7):
-            Data.objects.create(person=self.person, sleep_hours=8, mood=7, time_stamp=today - datetime.timedelta(days = i))
+            Data.objects.create(person=self.person, sleep_hours=data[i]['sleep_hours'], mood=data[i]['mood'], 
+                time_stamp=today - datetime.timedelta(days = i))
 
     def test_data_created(self):
-        person = Person.objects.get(id_telegram="1")
-        data = Data.objects.filter(person=person)
+        today = timezone.now()
+        person = Person.objects.get(id_telegram=self.person.id_telegram)
+        data = Data.objects.filter(person=person, time_stamp__range=[today - datetime.timedelta(days = 7), today])
         self.assertEquals(len(data),7)
 
     def test_info_data(self):
-        response = self.client.get("/graph/person/"+str(self.person.pk))
+        response = self.client.get("/graph/person/"+str(self.person.id_telegram))
         self.assertEquals(response.status_code, 200)
+        self.assertTemplateUsed(response, 'graph.html')
+        self.assertContains(response, 'Horas dormidas promedio: 6.9')
+        self.assertContains(response, 'Estado de animo promedio: 7.4')

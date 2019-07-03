@@ -1,3 +1,8 @@
-{{person}}
+Horas dormidas promedio: {{avg_sleep_hours}}
+Estado de animo promedio: {{avg_mood}}
 
-{{data}}
+{% if graph %}
+<div style="width:600;height:500">
+{{ graph|safe }}
+</div>
+{% endif %}
