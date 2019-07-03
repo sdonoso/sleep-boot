@@ -1,6 +1,6 @@
 import logging
 from telegram.ext import Updater
-from .messages import START_TEXT, REGISTRATION_TEXT
+from scriptBot.messages import START_TEXT, REGISTRATION_TEXT
 from telegram.ext import CommandHandler, ConversationHandler, MessageHandler, Filters
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
