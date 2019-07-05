@@ -1,36 +1,84 @@
 import logging
 
+import requests
 from telegram import Update
 from telegram.ext import CallbackContext, Updater
-from telegram.ext import CommandHandler, Filters, MessageHandler
+from telegram.ext import CommandHandler, ConversationHandler, Filters, MessageHandler
 
-from scriptBot.botSettings import KEY, BACKEND_URL
-from scriptBot.botSettings import KEY
+from scriptBot.botSettings import BACKEND_URL, KEY
+from scriptBot.messages import ALREADY_REGISTERED_MSG, GENERAL_ERROR, NOT_REGISTERED_ANSWER, REGISTRATION_CANCEL_MSG, \
+    REGISTRATION_SUCCESSFUL_MSG, START_MSG
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.INFO)
 
 logger = logging.getLogger(__name__)
 
-new_user = {}
-
 
 def start(update: Update, context: CallbackContext):
-    context.bot.send_message(chat_id=update.message.chat_id, text=START_TEXT)
-    new_user['chat_id'] = update.message.chat_id
-    return 1
+    """ Manages the start command """
+    # https://python-telegram-bot.readthedocs.io/en/stable/telegram.user.html
+    user = update.effective_user
+    result = 1
+    response = requests.get(BACKEND_URL + "persons/" + str(user["id"]))
+    if response.status_code == 200:
+        result = -1
+        username = response.json()["name"]
+        message = ALREADY_REGISTERED_MSG.format(name=username)
+        context.bot.send_message(chat_id=user['id'], text=message)
+    elif response.status_code == 404:
+        context.bot.send_message(chat_id=user['id'], text=START_MSG)
+    else:
+        result = -1
+        context.bot.send_message(chat_id=user['id'], text=GENERAL_ERROR)
+        response_error(response)
+    return result
+
+
+def cancel_register(update: Update, context: CallbackContext):
+    """ Manages the cancel command, when sent inside a registration """
+    user = update.effective_user
+    result = -1
+    context.bot.send_message(chat_id=user['id'], text=REGISTRATION_CANCEL_MSG)
+    return result
 
 
 def ask_name(update: Update, context: CallbackContext):
-    new_user['name'] = update.message
-    context.bot.send_message(chat_id=update.message.chat_id, text=REGISTRATION_TEXT)
-    # Todo: send new_user to django url for create new user
-    return -1
+    """ Manages the registering of a new user after asking it's name """
+    user = update.effective_user
+    result = -1
+    new_user = {
+        'name': update.message.text,
+        'id_telegram': user['id'],
+    }
+    response = requests.post(BACKEND_URL + "persons/", data=new_user)
+    if response.status_code == 201:
+        context.bot.send_message(chat_id=update.message.chat_id, text=REGISTRATION_SUCCESSFUL_MSG)
+    else:
+        result = 1
+        context.bot.send_message(chat_id=user['id'], text=GENERAL_ERROR)
+        response_error(response)
+    return result
+
+
+def unrecognized_answer(update: Update, context: CallbackContext):
+    """ Manages unrecognized answers """
+    user = update.effective_user
+    context.bot.send_message(chat_id=user['id'], text=NOT_REGISTERED_ANSWER)
 
 
 def error(update: Update, context: CallbackContext):
     """Log Errors caused by Updates."""
     logger.warning('Update "%s" caused error "%s"', update, context.error)
+
+
+def response_error(response):
+    """Log Errors caused by unexpected responses from the backend REST API"""
+    logger.warning(
+        'Received unexpected server response with code "%s", response: "%s"',
+        response.status_code,
+        response
+    )
 
 
 def main():
@@ -43,11 +91,15 @@ def main():
     flag = 0
     dp = updater.dispatcher
 
-    # on different commands - answer in Telegram
-    dp.add_handler(CommandHandler("start", start))
+    # Handler for the start conversation
+    # https://python-telegram-bot.readthedocs.io/en/stable/telegram.ext.conversationhandler.html
+    start_handler = ConversationHandler(
+        [CommandHandler('start', start), CommandHandler('register', start)],
+        {1: [MessageHandler(Filters.text, ask_name)]},
+        [CommandHandler('cancel', cancel_register), MessageHandler(Filters.all, unrecognized_answer)],
+    )
 
-    # on noncommand i.e message - echo the message on Telegram
-    dp.add_handler(MessageHandler(Filters.text, ask_name))
+    dp.add_handler(start_handler)
 
     # log all errors
     dp.add_error_handler(error)
@@ -60,6 +112,5 @@ def main():
     updater.idle()
 
 
-# TODO falta hacer que el bot no vuelva a responder despues  que se le manda el nombre
 if __name__ == '__main__':
     main()
