@@ -6,8 +6,9 @@ from telegram.ext import CallbackContext, Updater
 from telegram.ext import CommandHandler, ConversationHandler, Filters, MessageHandler
 
 from scriptBot.botSettings import BACKEND_URL, KEY
-from scriptBot.messages import ALREADY_REGISTERED_MSG, GENERAL_ERROR, NOT_REGISTERED_ANSWER, REGISTRATION_CANCEL_MSG, \
-    REGISTRATION_SUCCESSFUL_MSG, START_MSG, OFF_CONTEXT_CANCEL
+from scriptBot.messages import ALREADY_REGISTERED_MSG, CHANGE_NAME_EMPTY_MSG, CHANGE_NAME_UNREGISTERED_MSG, \
+    GENERAL_ERROR_MSG, NOT_REGISTERED_ANSWER_MSG, OFF_CONTEXT_CANCEL_MSG, REGISTRATION_CANCEL_MSG, \
+    REGISTRATION_SUCCESSFUL_MSG, START_MSG, CHANGE_NAME_SUCCESSFUL_MSG
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.INFO)
@@ -24,13 +25,12 @@ def start(update: Update, context: CallbackContext):
     if response.status_code == 200:
         result = -1
         username = response.json()["name"]
-        message = ALREADY_REGISTERED_MSG.format(name=username)
-        context.bot.send_message(chat_id=user['id'], text=message)
+        context.bot.send_message(chat_id=user['id'], text=ALREADY_REGISTERED_MSG.format(name=username))
     elif response.status_code == 404:
         context.bot.send_message(chat_id=user['id'], text=START_MSG)
     else:
         result = -1
-        context.bot.send_message(chat_id=user['id'], text=GENERAL_ERROR)
+        context.bot.send_message(chat_id=user['id'], text=GENERAL_ERROR_MSG)
         response_error(response)
     return result
 
@@ -53,24 +53,50 @@ def ask_name(update: Update, context: CallbackContext):
     }
     response = requests.post(BACKEND_URL + "persons/", data=new_user)
     if response.status_code == 201:
-        context.bot.send_message(chat_id=update.message.chat_id, text=REGISTRATION_SUCCESSFUL_MSG)
+        context.bot.send_message(chat_id=user['id'], text=REGISTRATION_SUCCESSFUL_MSG)
     else:
         result = 1
-        context.bot.send_message(chat_id=user['id'], text=GENERAL_ERROR)
+        context.bot.send_message(chat_id=user['id'], text=GENERAL_ERROR_MSG)
         response_error(response)
     return result
+
+
+def change_name(update: Update, context: CallbackContext):
+    """ Manages the changeName command """
+    user = update.effective_user
+    args = context.args
+    new_name = " ".join(args)
+    if new_name == '':
+        context.bot.send_message(chat_id=user['id'], text=CHANGE_NAME_EMPTY_MSG)
+    else:
+        response = requests.get(BACKEND_URL + "persons/" + str(user["id"]))
+        if response.status_code == 404:
+            context.bot.send_message(chat_id=user['id'], text=CHANGE_NAME_UNREGISTERED_MSG)
+        elif response.status_code == 200:
+            new_response = requests.put(
+                BACKEND_URL + "persons/" + str(user["id"]) + "/",
+                {"id_telegram": user["id"], "name": new_name}
+            )
+            if new_response.status_code == 200:
+                context.bot.send_message(chat_id=user['id'], text=CHANGE_NAME_SUCCESSFUL_MSG.format(name=new_name))
+            else:
+                context.bot.send_message(chat_id=user['id'], text=GENERAL_ERROR_MSG)
+                response_error(new_response)
+        else:
+            context.bot.send_message(chat_id=user['id'], text=GENERAL_ERROR_MSG)
+            response_error(response)
 
 
 def cancel_out_of_context(update: Update, context: CallbackContext):
     """ Manages the cancel command, when out of context """
     user = update.effective_user
-    context.bot.send_message(chat_id=user['id'], text=OFF_CONTEXT_CANCEL)
+    context.bot.send_message(chat_id=user['id'], text=OFF_CONTEXT_CANCEL_MSG)
 
 
 def unrecognized_answer(update: Update, context: CallbackContext):
     """ Manages unrecognized answers """
     user = update.effective_user
-    context.bot.send_message(chat_id=user['id'], text=NOT_REGISTERED_ANSWER)
+    context.bot.send_message(chat_id=user['id'], text=NOT_REGISTERED_ANSWER_MSG)
 
 
 def error(update: Update, context: CallbackContext):
@@ -81,9 +107,10 @@ def error(update: Update, context: CallbackContext):
 def response_error(response):
     """Log Errors caused by unexpected responses from the backend REST API"""
     logger.warning(
-        'Received unexpected server response with code "%s", response: "%s"',
+        'Received unexpected server response with code "%s",\n'
+        'response: "%s"',
         response.status_code,
-        response
+        response.content
     )
 
 
@@ -97,7 +124,7 @@ def main():
     flag = 0
     dp = updater.dispatcher
 
-    # Handler for the start conversation
+    # Handler for the /start and /register conversation
     # https://python-telegram-bot.readthedocs.io/en/stable/telegram.ext.conversationhandler.html
     start_handler = ConversationHandler(
         [CommandHandler('start', start), CommandHandler('register', start)],
@@ -106,6 +133,9 @@ def main():
     )
 
     dp.add_handler(start_handler)
+
+    # Handler for the /changeName command
+    dp.add_handler(CommandHandler('changeName', change_name, pass_args=True))
 
     # Handler for the /cancel command when out of context. This has to be after all the CommandHandlers of the bot
     dp.add_handler(CommandHandler('cancel', cancel_out_of_context))

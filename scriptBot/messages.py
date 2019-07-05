@@ -1,4 +1,4 @@
-START_MSG = "Hola, mi nombre es sleepBot y mi función es ayudarte a mejorar tu calidad de sueño y tu ánimo. " \
+START_MSG = "Hola, mi nombre es sleepBot y mi función es ayudarte a mejorar tu calidad de sueño y tu ánimo.\n" \
             "Por favor, ahora envíame tu nombre para registrarte."
 
 REGISTRATION_CANCEL_MSG = "Lamento que decidas cancelar el registro, pero si cambias de opinión puedes registrarte " \
@@ -10,8 +10,15 @@ REGISTRATION_SUCCESSFUL_MSG = "Muchas gracias por registrarte. Próximamente te 
 
 ALREADY_REGISTERED_MSG = "{name}, ya te encuentras registrado para mejorar tu calidad de sueño y ánimo."
 
-NOT_REGISTERED_ANSWER = "No entendí eso, ¿podrías intentar de nuevo?"
+NOT_REGISTERED_ANSWER_MSG = "No entendí eso, ¿podrías intentar de nuevo?"
 
-GENERAL_ERROR = "Estoy teniendo problemas internos, por favor intenta más tarde."
+GENERAL_ERROR_MSG = "Estoy teniendo problemas internos, por favor intenta más tarde."
 
-OFF_CONTEXT_CANCEL = "Ahora no tengo nada activo para cancelar."
+OFF_CONTEXT_CANCEL_MSG = "Ahora no tengo nada activo para cancelar."
+
+CHANGE_NAME_EMPTY_MSG = "Este comando requiere que le des tu nombre como argumento, por ejemplo\n/changeName Ariel"
+
+CHANGE_NAME_UNREGISTERED_MSG = "No te encuetras registrado, así que no puedo cambiar tu nombre.\nPara registrarte, " \
+                               "usa /register."
+
+CHANGE_NAME_SUCCESSFUL_MSG = "Cambiaste tu nombre exitosamente, desde ahora te llamaré {name}."
