@@ -22,3 +22,11 @@ CHANGE_NAME_UNREGISTERED_MSG = "No te encuetras registrado, así que no puedo ca
                                "usa /register."
 
 CHANGE_NAME_SUCCESSFUL_MSG = "Cambiaste tu nombre exitosamente, desde ahora te llamaré {name}."
+
+HELP_MSG = "Hola! Soy sleepBot y estoy aquí para ayudarte a mejorar tu calidad de sueño y tu ánimo.\n" \
+           "Puedes usar los siguientes comandos para interactuar conmigo:\n" \
+           "/changeName <i>name</i>: Cambia el nombre con el que me refiero a ti a <i>name</i>.\n" \
+           "/cancel: Cancela cualquier conversación que estés teniendo conmigo.\n" \
+           "/help: Muestra de nuevo este diálogo de ayuda. ¡Úsalo si alguna vez te pierdes en algo!\n" \
+           "/register: Al igual que /start inicia una conversación para registrar tus datos y empezar a " \
+           "analizar tus patrones de sueño."

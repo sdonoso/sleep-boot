@@ -4,11 +4,12 @@ import requests
 from telegram import Update
 from telegram.ext import CallbackContext, Updater
 from telegram.ext import CommandHandler, ConversationHandler, Filters, MessageHandler
+from telegram.parsemode import ParseMode
 
 from scriptBot.botSettings import BACKEND_URL, KEY
 from scriptBot.messages import ALREADY_REGISTERED_MSG, CHANGE_NAME_EMPTY_MSG, CHANGE_NAME_UNREGISTERED_MSG, \
     GENERAL_ERROR_MSG, NOT_REGISTERED_ANSWER_MSG, OFF_CONTEXT_CANCEL_MSG, REGISTRATION_CANCEL_MSG, \
-    REGISTRATION_SUCCESSFUL_MSG, START_MSG, CHANGE_NAME_SUCCESSFUL_MSG
+    REGISTRATION_SUCCESSFUL_MSG, START_MSG, CHANGE_NAME_SUCCESSFUL_MSG, HELP_MSG
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.INFO)
@@ -87,6 +88,12 @@ def change_name(update: Update, context: CallbackContext):
             response_error(response)
 
 
+def help_command(update: Update, context: CallbackContext):
+    """ Manages the help command """
+    user = update.effective_user
+    context.bot.send_message(chat_id=user['id'], text=HELP_MSG, parse_mode=ParseMode.HTML)
+
+
 def cancel_out_of_context(update: Update, context: CallbackContext):
     """ Manages the cancel command, when out of context """
     user = update.effective_user
@@ -136,6 +143,9 @@ def main():
 
     # Handler for the /changeName command
     dp.add_handler(CommandHandler('changeName', change_name, pass_args=True))
+
+    # Handler for the /help command
+    dp.add_handler(CommandHandler('help', help_command))
 
     # Handler for the /cancel command when out of context. This has to be after all the CommandHandlers of the bot
     dp.add_handler(CommandHandler('cancel', cancel_out_of_context))
