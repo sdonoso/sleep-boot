@@ -4,7 +4,7 @@ from telegram import Update
 from telegram.ext import CallbackContext, Updater
 from telegram.ext import CommandHandler, Filters, MessageHandler
 
-from scriptBot.messages import REGISTRATION_TEXT, START_TEXT
+from scriptBot.botSettings import KEY, BACKEND_URL
 from scriptBot.botSettings import KEY
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
