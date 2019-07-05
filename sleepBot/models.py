@@ -1,11 +1,11 @@
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.utils import timezone
-from django.core.validators import MaxValueValidator, MinValueValidator
 
 
 class Person(models.Model):
     name = models.CharField(max_length=150)
-    id_telegram = models.CharField(max_length=150)
+    id_telegram = models.PositiveIntegerField(primary_key=True)
     creation_date = models.DateTimeField(default=timezone.now)
 
 
