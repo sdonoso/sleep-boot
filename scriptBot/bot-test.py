@@ -7,7 +7,7 @@ from telegram.ext import CommandHandler, ConversationHandler, Filters, MessageHa
 
 from scriptBot.botSettings import BACKEND_URL, KEY
 from scriptBot.messages import ALREADY_REGISTERED_MSG, GENERAL_ERROR, NOT_REGISTERED_ANSWER, REGISTRATION_CANCEL_MSG, \
-    REGISTRATION_SUCCESSFUL_MSG, START_MSG
+    REGISTRATION_SUCCESSFUL_MSG, START_MSG, OFF_CONTEXT_CANCEL
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.INFO)
@@ -61,6 +61,12 @@ def ask_name(update: Update, context: CallbackContext):
     return result
 
 
+def cancel_out_of_context(update: Update, context: CallbackContext):
+    """ Manages the cancel command, when out of context """
+    user = update.effective_user
+    context.bot.send_message(chat_id=user['id'], text=OFF_CONTEXT_CANCEL)
+
+
 def unrecognized_answer(update: Update, context: CallbackContext):
     """ Manages unrecognized answers """
     user = update.effective_user
@@ -100,6 +106,9 @@ def main():
     )
 
     dp.add_handler(start_handler)
+
+    # Handler for the /cancel command when out of context. This has to be after all the CommandHandlers of the bot
+    dp.add_handler(CommandHandler('cancel', cancel_out_of_context))
 
     # log all errors
     dp.add_error_handler(error)

@@ -13,3 +13,5 @@ ALREADY_REGISTERED_MSG = "{name}, ya te encuentras registrado para mejorar tu ca
 NOT_REGISTERED_ANSWER = "No entendí eso, ¿podrías intentar de nuevo?"
 
 GENERAL_ERROR = "Estoy teniendo problemas internos, por favor intenta más tarde."
+
+OFF_CONTEXT_CANCEL = "Ahora no tengo nada activo para cancelar."
