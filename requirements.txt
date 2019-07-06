@@ -13,6 +13,7 @@ django-filter==2.1.0
 djangorestframework==3.9.4
 entrypoints==0.3
 future==0.17.1
+gunicorn==19.9.0
 idna==2.8
 ipython-genutils==0.2.0
 jeepney==0.4
