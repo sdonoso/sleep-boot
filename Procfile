@@ -1,1 +1,1 @@
-web: gunicorn sleep-bot.wsgi --log-file
+web: gunicorn sleep-bot.wsgi
