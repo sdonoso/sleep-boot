@@ -107,6 +107,7 @@ venv.bak/
 .idea/
 sleepBot/migrations/
 key.txt
+migrations/
 
 # bot settings
 scriptBot/botSettings.py
