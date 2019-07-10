@@ -28,4 +28,5 @@ urlpatterns = [
     path('', include(router.urls)),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     path('graph/person/<str:id_telegram>', views.InfoDataPerson.as_view(), name = 'graph-person'),
+    path('person/date_today/<str:id_telegram>', views.DateToday.as_view(), name = 'date-today'),
 ]

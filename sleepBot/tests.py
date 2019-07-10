@@ -2,6 +2,7 @@ import datetime
 
 from django.test import Client, TestCase
 from django.utils import timezone
+import json
 
 from .models import Data, Person
 
@@ -83,3 +84,19 @@ class InfoDataWeek(TestCase):
         self.assertContains(response, 'Días respondidos: 7 de 7')
         self.assertContains(response, 'Horas dormidas promedio: 6.9')
         self.assertContains(response, 'Estado de animo promedio: 7.4')
+
+class DataToday(TestCase):
+
+    def setUp(self):
+        self.client = Client()
+        self.person1 = Person.objects.create(id_telegram=1, name="Jorge")
+        self.person2 = Person.objects.create(id_telegram=2, name="Ara")
+        Data.objects.create(person=self.person1, sleep_hours=8, mood=4)
+
+    def test_data_today(self):
+        response1 = self.client.get("/person/date_today/1")
+        response1 = json.loads(response1.content)
+        self.assertTrue(response1['answered_today'])
+        response2 = self.client.get("/person/date_today/2")
+        response2 = json.loads(response2.content)
+        self.assertFalse(response2['answered_today'])
