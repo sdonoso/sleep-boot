@@ -72,7 +72,8 @@ class InfoDataWeek(TestCase):
     def test_data_created(self):
         today = timezone.now()
         person = Person.objects.get(id_telegram=self.person.id_telegram)
-        data = Data.objects.filter(person=person, time_stamp__range=[today - datetime.timedelta(days=7), today])
+        data = Data.objects.filter(person=person, time_stamp__range=[today - datetime.timedelta(days=7), today]).order_by('time_stamp')
+
         self.assertEquals(len(data), 7)
 
     def test_info_data(self):
