@@ -77,5 +77,6 @@ class InfoDataPerson(View):
 
         self.context["avg_mood"] = round(avg_mood,1)
         self.context["avg_sleep_hours"] = round(avg_sleep_hours,1)
+        self.context['cant_responses'] = len(data)
 
         return render(request, self.template, self.context)

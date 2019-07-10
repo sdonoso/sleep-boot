@@ -80,5 +80,6 @@ class InfoDataWeek(TestCase):
         response = self.client.get("/graph/person/" + str(self.person.id_telegram))
         self.assertEquals(response.status_code, 200)
         self.assertTemplateUsed(response, 'graph.html')
+        self.assertContains(response, 'Días respondidos: 7 de 7')
         self.assertContains(response, 'Horas dormidas promedio: 6.9')
         self.assertContains(response, 'Estado de animo promedio: 7.4')
