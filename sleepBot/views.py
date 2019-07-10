@@ -86,7 +86,7 @@ class DateToday(View):
     def get(self, request, id_telegram, *args, **kwargs):
         person = Person.objects.get(id_telegram=id_telegram)
         today = timezone.now()
-        data = Data.objects.filter(person=person, time_stamp__day=today.day)
+        data = Data.objects.filter(person=person, time_stamp__day=today.day, time_stamp__year=today.year, time_stamp__month=today.month)
         if (len(data) == 0):
             return JsonResponse({'answered_today': False})
         return JsonResponse({'answered_today': True})
