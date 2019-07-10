@@ -25,7 +25,7 @@ SECRET_KEY = '!r$ai+2z69+&psfey3h2lk#-45-b7%1+oefbbs(svyt9q-ed=8'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['.herokuapp.com', "localhost"]
+ALLOWED_HOSTS = ['*']
 
 # Application definition
 
@@ -48,12 +48,9 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-]
-MIDDLEWARE_CLASSES = (
-    # Simplified static file serving.
-    # https://warehouse.python.org/project/whitenoise/
     'whitenoise.middleware.WhiteNoiseMiddleware',
-)
+]
+
 
 ROOT_URLCONF = 'sleep-bot.urls'
 
@@ -122,11 +119,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
-# Extra places for static to find static files.
-STATICFILES_DIRS = (
-    os.path.join(BASE_DIR, 'sleepBot/static'),
-)
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
