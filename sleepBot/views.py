@@ -3,7 +3,7 @@ from django.shortcuts import redirect, render
 from rest_framework import viewsets
 import datetime
 from django.utils import timezone
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponseNotFound
 
 from .serializers import PersonSerializer, DataSerializer
 from .models import Person, Data
@@ -84,9 +84,12 @@ class InfoDataPerson(View):
 
 class DateToday(View):
     def get(self, request, id_telegram, *args, **kwargs):
-        person = Person.objects.get(id_telegram=id_telegram)
+        try:
+            person = Person.objects.get(id_telegram=id_telegram)
+        except Person.DoesNotExist:
+            return HttpResponseNotFound('Not Registered')
         today = timezone.now()
         data = Data.objects.filter(person=person, time_stamp__day=today.day, time_stamp__year=today.year, time_stamp__month=today.month)
-        if (len(data) == 0):
+        if len(data) == 0:
             return JsonResponse({'answered_today': False})
         return JsonResponse({'answered_today': True})
